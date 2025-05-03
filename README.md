@@ -1,13 +1,13 @@
 [//]: # (note for me - Linux/Unix Desktops > Desktop Extensions > KDE Plasma Extensions > Plasma Wallpaper Plugins)
 
-## **This project is still maintained but I need help to solve the latest Plasma 6 bug. If you'd like to help, check out the issues.**
-
 <p align="center">
   <a href="https://www.pling.com/p/2017888/">
     <img alt="ActiveBlur" src="assets/store-img.png" width="220"/>
   </a>
 </p>
 <h1 align="center">Active Blur <i>- a plasma wallpaper plugin</i></h1>
+
+<img alt="Static Badge" src="https://img.shields.io/badge/Still_maintened-Yes_%3A)-green">
 
 https://user-images.githubusercontent.com/30547569/233472177-a752d175-291a-4ba3-877d-dcd25a79b6e4.mp4
 
