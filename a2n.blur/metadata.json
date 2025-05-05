@@ -38,5 +38,6 @@
         "image/bmp",
         "image/webp",
         "image/tiff"
-    ]
+    ],
+    "X-Plasma-API": "declarativescript"
 }
