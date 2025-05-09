@@ -19,26 +19,14 @@ import QtQml.Models
 WallpaperItem {
     id: root
 
-    property Item activeTaskItem:
-        windowInfoLoader.item.activeTaskItem
-
-    readonly property bool isTaskBarFocused:
-        windowInfoLoader.item.isTaskBarFocused
-
-    // isAnyWindowActive handle the showing of the blur effect
-    readonly property bool isAnyWindowActive:
-        isTaskBarFocused || windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
+    readonly property bool shouldApplyBlur: windowTracker.existsWindowActive
 
     TaskManager.ActivityInfo { id: activityInfo }
     TaskManager.VirtualDesktopInfo { id: virtualDesktopInfo }
 
-    Loader {
-        id: windowInfoLoader
-        sourceComponent: tasksModel
-        Component {
-            id: tasksModel
-            TasksModel {}
-        }
+    // Direct component instantiation instead of using a Loader
+    TasksModel {
+        id: windowTracker
     }
 
     // used by WallpaperInterface for drag and drop
@@ -108,7 +96,7 @@ WallpaperItem {
         layer.enabled: root.configuration.ActiveBlur
         layer.effect: FastBlur {
             anchors.fill: parent
-            radius: isAnyWindowActive ? 0 : root.configuration.BlurRadius
+            radius: shouldApplyBlur ? root.configuration.BlurRadius : 0
             source: Image {
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectCrop
@@ -118,6 +106,7 @@ WallpaperItem {
             Behavior on radius {
                 NumberAnimation {
                     duration: root.configuration.AnimationDuration
+                    easing.type: Easing.InOutQuad
                 }
             }
         }

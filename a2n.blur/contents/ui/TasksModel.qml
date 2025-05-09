@@ -1,21 +1,12 @@
 import QtQuick
-import QtQml.Models
-import QtQuick.Window
+import org.kde.plasma.core as PlasmaCore
 import org.kde.taskmanager as TaskManager
-import org.kde.kwindowsystem as KwinSys
 
 Item {
-    id: plasmaTasksItem
+    id: windowTracker
 
-    property Item activeTaskItem: null
-
-    // true if a window is focus (e.g.: firefox)
-    readonly property bool existsWindowActive:
-        root.activeTaskItem && tasksRepeater.count > 0 && activeTaskItem.isActive
-
-    // true if taskbar elements are focused (e.g.: yakuake)
-    readonly property bool isTaskBarFocused:
-        false
+    // Expose a single property for the main component to check
+    readonly property bool existsWindowActive: tasksModel.activeTask !== null
 
     TaskManager.TasksModel {
         id: tasksModel
@@ -26,24 +17,37 @@ Item {
         filterByVirtualDesktop: true
         filterByActivity: true
         filterByScreen: true
-    }
 
-    Item {
-        id: taskList
+        // Track active tasks
+        property var activeTask: null
 
-        Repeater {
-            id: tasksRepeater
-            model: tasksModel
-
-            Item {
-                id: task
-                readonly property bool isActive: model.IsActive
-
-                onIsActiveChanged: {
-                    console.log('xxxxxxxxx', plasmaTasksItem.isTaskBarFocused)
-                    if (isActive) plasmaTasksItem.activeTaskItem = task
-                }
+        // Use connections to monitor active task changes
+        onDataChanged: (topLeft, bottomRight, roles) => {
+            if (roles.includes(TaskManager.AbstractTasksModel.IsActive)) {
+                updateActiveTask();
             }
         }
+
+        onRowsInserted: updateActiveTask()
+        onRowsRemoved: updateActiveTask()
+        onModelReset: updateActiveTask()
+
+        function updateActiveTask() {
+            for (let i = 0; i < tasksModel.rowCount(); i++) {
+                const idx = tasksModel.index(i, 0);
+                if (tasksModel.data(idx, TaskManager.AbstractTasksModel.IsActive)) {
+                    activeTask = idx;
+                    return;
+                }
+            }
+            activeTask = null;
+        }
+
+        Component.onCompleted: updateActiveTask()
+    }
+
+    Component.onDestruction: {
+        // Proper cleanup
+        tasksModel.activeTask = null;
     }
 }
