@@ -2,13 +2,20 @@ import QtQuick
 import QtQml.Models
 import QtQuick.Window
 import org.kde.taskmanager as TaskManager
-import org.kde.kwindowsystem as Kwin
+import org.kde.kwindowsystem as KwinSys
 
 Item {
     id: plasmaTasksItem
 
-    readonly property bool existsWindowActive: root.activeTaskItem && tasksRepeater.count > 0 && activeTaskItem.isActive
     property Item activeTaskItem: null
+
+    // true if a window is focus (e.g.: firefox)
+    readonly property bool existsWindowActive:
+        root.activeTaskItem && tasksRepeater.count > 0 && activeTaskItem.isActive
+
+    // true if taskbar elements are focused (e.g.: yakuake)
+    readonly property bool isTaskBarFocused:
+        false
 
     TaskManager.TasksModel {
         id: tasksModel
@@ -16,9 +23,9 @@ Item {
         groupMode: TaskManager.TasksModel.GroupDisabled
         activity: activityInfo.currentActivity
         virtualDesktop: virtualDesktopInfo.currentDesktop
-        // filterByVirtualDesktop: true
-        // filterByActivity: true
-        // filterByScreen: true
+        filterByVirtualDesktop: true
+        filterByActivity: true
+        filterByScreen: true
     }
 
     Item {
@@ -31,17 +38,9 @@ Item {
             Item {
                 id: task
                 readonly property bool isActive: model.IsActive
-                readonly property string windowTitle: model.display
-                readonly property var windowTypes: model.windowTypes
 
                 onIsActiveChanged: {
-
-                    console.log(model.AppId, 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
-                    const arr = ['hasModelChildren', 'ChildCount', 'IsFullScreenable', 'IsLauncher', 'IsResizable', 'IsClosable', 'AppId', 'IsActive', 'IsWindow', 'StackingOrder']
-                    arr.forEach((v) => {
-                        console.log(`${v}: ${model[v]}`)
-                    })
-
+                    console.log('xxxxxxxxx', plasmaTasksItem.isTaskBarFocused)
                     if (isActive) plasmaTasksItem.activeTaskItem = task
                 }
             }

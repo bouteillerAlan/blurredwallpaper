@@ -19,9 +19,15 @@ import QtQml.Models
 WallpaperItem {
     id: root
 
-    //property bool isAnyWindowActive: Application.active
-    readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
-    property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
+    property Item activeTaskItem:
+        windowInfoLoader.item.activeTaskItem
+
+    readonly property bool isTaskBarFocused:
+        windowInfoLoader.item.isTaskBarFocused
+
+    // isAnyWindowActive handle the showing of the blur effect
+    readonly property bool isAnyWindowActive:
+        isTaskBarFocused || windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
 
     TaskManager.ActivityInfo { id: activityInfo }
     TaskManager.VirtualDesktopInfo { id: virtualDesktopInfo }
