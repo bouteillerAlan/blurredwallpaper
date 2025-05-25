@@ -51,14 +51,15 @@ Item {
             let maximizedCount = 0;
             for (var i = 0; i < model.count; i++) {
                 const currentTask = model.index(i, 0);
-                if (currentTask === undefined)
-                    continue;
+                if (currentTask === undefined) continue;
                 if (model.data(currentTask, isWindow) && !model.data(currentTask, isMinimized)) {
                     visibleCount += 1;
-                    if (model.data(currentTask, isMaximized) || model.data(currentTask, isFullScreen))
+                    if (model.data(currentTask, isMaximized) || model.data(currentTask, isFullScreen)) {
                         maximizedCount += 1;
-                    if (model.data(currentTask, isActive))
+                    }
+                    if (model.data(currentTask, isActive)) {
                         activeCount += 1;
+                    }
                 }
             }
             console.log(JSON.stringify({
@@ -67,7 +68,7 @@ Item {
                 maximizedCount,
                 "tasksModel.count": tasksModel.count,
                 "tasksModel.rowCount": tasksModel.rowCount(),
-            }, null, 2))
+            }, null, 0))
         }
 
         function updateActiveTask() {
