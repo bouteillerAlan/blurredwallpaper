@@ -92,6 +92,7 @@ thumbnail: Rectangle {
     layer.enabled: cfg_ActiveBlur
 
     layer.effect: FastBlur {
+      visible: cfg_ActiveBlur
       anchors.fill: parent
       radius: wallpaperDelegate.hovered ? cfg_BlurRadius : 0
       source: Image {
@@ -107,6 +108,22 @@ thumbnail: Rectangle {
         NumberAnimation {
           duration: cfg_AnimationDuration
         }
+      }
+    }
+  }
+
+  ColorOverlay {
+    id: activeColorOverlay
+    anchors.fill: previewImage
+    source: previewImage
+    visible: cfg_ActiveColor
+    color: cfg_ActiveColorColor
+    opacity: (cfg_ActiveColor && wallpaperDelegate.hovered) ? cfg_ActiveColorTransparency / 100 : 0
+
+    // animate the color apparition
+    Behavior on opacity {
+      NumberAnimation {
+        duration: cfg_AnimationDuration
       }
     }
   }
