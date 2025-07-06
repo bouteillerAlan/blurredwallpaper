@@ -80,6 +80,13 @@ WallpaperItem {
         root.loading = true; // delays ksplash until the wallpaper has been loaded
     }
 
+    Image {
+      id: sourceWallpaper
+      anchors.fill: parent
+      fillMode: Image.PreserveAspectCrop
+      source: imageView.source
+    }
+
     ImageStackView {
         id: imageView
         anchors.fill: parent
@@ -109,11 +116,7 @@ WallpaperItem {
           visible: root.configuration.ActiveBlur
           anchors.fill: parent
           radius: isAnyWindowActive ? 0 : root.configuration.BlurRadius
-          source: Image {
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectCrop
-            source: imageView.source
-          }
+          source: sourceWallpaper
           // animate the blur apparition
           Behavior on radius {
             NumberAnimation {
@@ -126,10 +129,9 @@ WallpaperItem {
           id: activeColor
           visible: root.configuration.ActiveColor
           anchors.fill: parent
-          source: activeBlur.visible ? activeBlur : imageView
           color: root.configuration.ActiveColorColor
           opacity: isAnyWindowActive ? 0 : root.configuration.ActiveColorTransparency / 100
-
+          source: root.configuration.ActiveBlur ? activeBlur : sourceWallpaper
           // animate the color apparition
           Behavior on opacity {
             NumberAnimation {
