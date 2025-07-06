@@ -1,3 +1,7 @@
+## V3.3
+ - Fix the code for KDE 6.4
+ - Add an option to also darken the wallpaper
+
 ## V3.2
   - Unblur is now trigger when the user "unactive" a window
 
