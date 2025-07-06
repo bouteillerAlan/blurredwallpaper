@@ -14,144 +14,133 @@ import org.kde.kquickcontrolsaddons
 import org.kde.kcmutils as KCM
 
 KCM.GridDelegate {
-    id: wallpaperDelegate
+  id: wallpaperDelegate
 
-    property alias color: backgroundRect.color
-    opacity: model.pendingDeletion ? 0.5 : 1
-    scale: index, 1 // Workaround for https://bugreports.qt.io/browse/QTBUG-107458
+  property alias color: backgroundRect.color
+  property alias previewSize: previewImage.sourceSize
+  opacity: model.pendingDeletion ? 0.5 : 1
+  scale: index, 1 // Workaround for https://bugreports.qt.io/browse/QTBUG-107458
 
-    text: model.display
-    subtitle: model.author
+  text: model.display
+  subtitle: model.author
 
-    hoverEnabled: true
+  hoverEnabled: true
 
-    actions: [
-        Kirigami.Action {
-            icon.name: "document-open-folder"
-            tooltip: i18nd("plasma_wallpaper_org.kde.image", "Open Containing Folder")
-            onTriggered: imageModel.openContainingFolder(index)
-        },
-        Kirigami.Action {
-            icon.name: "edit-undo"
-            visible: model.pendingDeletion
-            tooltip: i18nd("plasma_wallpaper_org.kde.image", "Restore wallpaper")
-            onTriggered: model.pendingDeletion = false
-        },
-        Kirigami.Action {
-            icon.name: "edit-delete"
-            tooltip: i18nd("plasma_wallpaper_org.kde.image", "Remove Wallpaper")
-            visible: model.removable && !model.pendingDeletion && !cfg_IsSlideshow
-            onTriggered: {
-                model.pendingDeletion = true;
+  actions: [
+    Kirigami.Action {
+      icon.name: "document-open-folder"
+      tooltip: i18nd("plasma_wallpaper_org.kde.image", "Open Containing Folder")
+      onTriggered: imageModel.openContainingFolder(index)
+    },
+    Kirigami.Action {
+      icon.name: "edit-undo"
+      visible: model.pendingDeletion
+      tooltip: i18nd("plasma_wallpaper_org.kde.image", "Restore wallpaper")
+      onTriggered: model.pendingDeletion = false
+    },
+  Kirigami.Action {
+    icon.name: "edit-delete"
+    tooltip: i18nd("plasma_wallpaper_org.kde.image", "Remove Wallpaper")
+    visible: model.removable && !model.pendingDeletion && configDialog.currentWallpaper == "org.kde.image"
+    onTriggered: {
+      model.pendingDeletion = true;
+      if (wallpapersGrid.view.currentIndex === index) {
+        const newIndex = (index + 1) % (imageModel.count - 1);
+        wallpapersGrid.view.itemAtIndex(newIndex).clicked();
+      }
+      root.configurationChanged(); // BUG 438585
+    }
+  }
+]
 
-                if (wallpapersGrid.view.currentIndex === index) {
-                    const newIndex = (index + 1) % (imageModel.count - 1);
-                    wallpapersGrid.view.itemAtIndex(newIndex).clicked();
-                }
-                root.configurationChanged(); // BUG 438585
-            }
-        }
-    ]
+thumbnail: Rectangle {
+  id: backgroundRect
+  color: cfg_Color
+  anchors.fill: parent
 
-    thumbnail: Rectangle {
-        id: backgroundRect
-        color: cfg_Color
+  Kirigami.Icon {
+    anchors.centerIn: parent
+    width: Kirigami.Units.iconSizes.large
+    height: width
+    source: "view-preview"
+    visible: previewImage.status != Image.Ready
+  }
+
+  FastBlur {
+    id: fastBlur
+    visible: cfg_Blur
+    anchors.fill: parent
+    radius: 4
+    source: Image {
+      asynchronous: true
+      cache: false
+      fillMode: Image.PreserveAspectCrop
+      source: fastBlur.visible ? previewImage.source : ""
+      sourceSize: previewImage.sourceSize
+      visible: false
+    }
+  }
+
+  Image {
+    id: previewImage
+    anchors.fill: parent
+    asynchronous: true
+    cache: false
+    fillMode: cfg_FillMode
+    source: model.preview
+
+    layer.enabled: cfg_ActiveBlur
+
+    layer.effect: FastBlur {
+      anchors.fill: parent
+      radius: wallpaperDelegate.hovered ? cfg_BlurRadius : 0
+      source: Image {
+        asynchronous: true
+        cache: false
+        fillMode: Image.PreserveAspectCrop
+        source: previewImage.source
+        sourceSize: previewImage.sourceSize
         anchors.fill: parent
-
-        Kirigami.Icon {
-            anchors.centerIn: parent
-            width: Kirigami.Units.iconSizes.large
-            height: width
-            source: "view-preview"
-            visible: !walliePreview.visible
+      }
+      // animate the blur apparition
+      Behavior on radius {
+        NumberAnimation {
+          duration: cfg_AnimationDuration
         }
-
-        QPixmapItem {
-            id: blurBackgroundSource
-            visible: cfg_Blur
-            anchors.fill: parent
-            smooth: true
-            pixmap: model.screenshot
-            fillMode: QPixmapItem.PreserveAspectCrop
-        }
-
-        FastBlur {
-            visible: cfg_Blur
-            anchors.fill: parent
-            source: blurBackgroundSource
-            radius: 4
-        }
-
-        QPixmapItem {
-            id: walliePreview
-            anchors.fill: parent
-            visible: model.screenshot !== null
-            smooth: true
-            pixmap: model.screenshot
-            fillMode: {
-                if (cfg_FillMode === Image.Stretch) {
-                    return QPixmapItem.Stretch;
-                } else if (cfg_FillMode === Image.PreserveAspectFit) {
-                    return QPixmapItem.PreserveAspectFit;
-                } else if (cfg_FillMode === Image.PreserveAspectCrop) {
-                    return QPixmapItem.PreserveAspectCrop;
-                } else if (cfg_FillMode === Image.Tile) {
-                    return QPixmapItem.Tile;
-                } else if (cfg_FillMode === Image.TileVertically) {
-                    return QPixmapItem.TileVertically;
-                } else if (cfg_FillMode === Image.TileHorizontally) {
-                    return QPixmapItem.TileHorizontally;
-                }
-                return QPixmapItem.PreserveAspectFit;
-            }
-            layer.enabled: cfg_ActiveBlur
-            layer.effect: FastBlur {
-                anchors.fill: parent
-                radius: wallpaperDelegate.hovered ? cfg_BlurRadius : 0
-                source: Image {
-                    anchors.fill: parent
-                    fillMode: Image.PreserveAspectCrop
-                    source: walliePreview
-                }
-                // animate the blur apparition
-                Behavior on radius {
-                    NumberAnimation {
-                        duration: cfg_AnimationDuration
-                    }
-                }
-            }
-        }
-
-        QtControls2.CheckBox {
-            visible: cfg_IsSlideshow
-            anchors.right: parent.right
-            anchors.top: parent.top
-            checked: visible ? model.checked : false
-            onToggled: model.checked = checked
-        }
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Kirigami.Units.longDuration
-                easing.type: Easing.InOutQuad
-            }
-        }
+      }
     }
+  }
 
-    Behavior on opacity {
-        OpacityAnimator {
-            duration: Kirigami.Units.longDuration
-            easing.type: Easing.InOutQuad
-        }
-    }
+  QtControls2.CheckBox {
+    visible: cfg_IsSlideshow
+    anchors.right: parent.right
+    anchors.top: parent.top
+    checked: visible ? model.checked : false
+    onToggled: model.checked = checked
+  }
 
-    onClicked: {
-        if (!cfg_IsSlideshow) {
-            cfg_Image = model.packageName || model.path;
-            if (typeof wallpaper !== "undefined") {
-                wallpaper.configuration.PreviewImage = cfg_Image;
-            }
-        }
-        GridView.currentIndex = index;
+  Behavior on color {
+    ColorAnimation {
+      duration: Kirigami.Units.longDuration
+      easing.type: Easing.InOutQuad
     }
+  }
+}
+
+Behavior on opacity {
+  OpacityAnimator {
+    duration: Kirigami.Units.longDuration
+    easing.type: Easing.InOutQuad
+  }
+}
+
+onClicked: {
+  if (!cfg_IsSlideshow) {
+    cfg_Image = model.packageName || model.path;
+    if (typeof wallpaper !== "undefined") {
+      wallpaper.configuration.PreviewImage = cfg_Image;
+    }
+  }
+  GridView.currentIndex = index;
+}
 }
