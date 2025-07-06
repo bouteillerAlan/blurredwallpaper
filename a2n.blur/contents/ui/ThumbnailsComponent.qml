@@ -60,14 +60,16 @@ Item {
             text: i18nd("plasma_wallpaper_org.kde.image", "Images")
             actions: [
                 Kirigami.Action {
-                    icon.name: "insert-image-symbolic"
+                    icon.name: "list-add-symbolic"
                     text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the thing being added is an image file", "Add…")
+                    Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Add Wallpaper Image…")
                     visible: !cfg_IsSlideshow
                     onTriggered: root.openChooserDialog();
                 },
                 NewStuff.Action {
                     configFile: Kirigami.Settings.isMobile ? "wallpaper-mobile.knsrc" : "wallpaper.knsrc"
                     text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the new things being gotten are wallpapers", "Get New…")
+                    Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Get New Wallpaper Images…")
                     viewMode: NewStuff.Page.ViewMode.Preview
                 }
             ]
@@ -107,6 +109,7 @@ Item {
 
                 view.delegate: WallpaperDelegate {
                     color: cfg_Color
+                    previewSize: Qt.size(thumbnailsComponent.screenSize.width / 8, thumbnailsComponent.screenSize.height / 8)
                 }
             }
         }
