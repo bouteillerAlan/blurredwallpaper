@@ -21,6 +21,18 @@
       <label>Blur radius</label>
       <default>40</default>
     </entry>
+    <entry name="ActiveColor" type="bool">
+      <label>Active Color</label>
+      <default>false</default>
+    </entry>
+    <entry name="ActiveColorTransparency" type="int">
+      <label>Color Transparency</label>
+      <default>20</default>
+    </entry>
+    <entry name="ActiveColorColor" type="String">
+      <label>Active Color color</label>
+      <default>#000</default>
+    </entry>
     <entry name="AnimationDuration" type="int">
       <label>How quickly the change takes effect.</label>
       <default>400</default>

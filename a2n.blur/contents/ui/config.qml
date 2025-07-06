@@ -21,7 +21,7 @@ import org.kde.kirigami as Kirigami
  */
 ColumnLayout {
     id: root
-        
+
     property var configDialog
     property var wallpaperConfiguration: wallpaper.configuration
     property var parentLayout
@@ -50,6 +50,9 @@ ColumnLayout {
     property alias cfg_ActiveBlur: activeBlurRadioButton.checked
     property int cfg_AnimationDuration: 400
     property int cfg_BlurRadius: 40
+    property alias cfg_ActiveColor: activeColorRadioButton.checked
+    property int cfg_ActiveColorTransparency: 20
+    property alias cfg_ActiveColorColor: activeColorColorButton.color
     property alias cfg_IsSlideshow: activeSlideshowRadioButton.checked
 
     signal configurationChanged()
@@ -256,6 +259,33 @@ ColumnLayout {
             visible: blurRadiusSpinBox.value > 64
         }
 
+        // on/off button for active color
+        QtControls2.CheckBox {
+          id: activeColorRadioButton
+          visible: true
+          Kirigami.FormData.label: "Active Color:"
+          text: activeColorRadioButton.checked ? "On" : "Off"
+        }
+
+        QtControls2.SpinBox {
+          Kirigami.FormData.label: "Color transparency:"
+          id: colorTransparencySpinBox
+          value: cfg_ActiveColorTransparency
+          onValueChanged: cfg_ActiveColorTransparency = value
+          stepSize: 1
+          from: 0
+          to: 100
+          editable: true
+          enabled: activeColorRadioButton.checked
+        }
+
+        KQuickControls.ColorButton {
+          id: activeColorColorButton
+          Kirigami.FormData.label: "Color: "
+          enabled: activeColorRadioButton.checked
+        }
+
+
         // slider for the active blur animation delay
         QtControls2.SpinBox {
             Kirigami.FormData.label: "Animation Delay:"
@@ -266,7 +296,7 @@ ColumnLayout {
             to: 60000 // 1 minute in ms
             stepSize: 50
             editable: true
-            enabled: activeBlurRadioButton.checked
+            enabled: activeBlurRadioButton.checked || activeColorRadioButton.checked
 
             textFromValue: function(value, locale) {
                 return i18n("%1ms", value)
@@ -319,7 +349,7 @@ ColumnLayout {
                 thumbnailsLoader.setSource(source, props);
             }
         }
-        
+
         Connections {
             target: configDialog
             function onCurrentWallpaperChanged() {
@@ -335,11 +365,11 @@ ColumnLayout {
                 thumbnailsLoader.loadWallpaper();
             }
         }
-        
+
         Component.onCompleted: () => {
             thumbnailsLoader.loadWallpaper();
         }
-        
+
     }
 
     Component.onDestruction: {
