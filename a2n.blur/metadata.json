@@ -7,8 +7,8 @@
                 "Name": "Bouteiller <a2n> Alan"
             }
         ],
-        "Category": "",
-        "Description": "Wallpaper view for images & slideshow with active blur",
+        "Category": "Plasma Wallpaper Plugins",
+        "Description": "A wallpaper plugin that automatically blurs and/or darken your wallpaper when windows are active.",
         "Icon": "preferences-desktop-wallpaper",
         "Id": "a2n.blur",
         "License": "GPLv2+",
