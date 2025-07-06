@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+    <kcfgfile name=""/>
+    <group name="Effect">
+        <entry name="ActiveBlur" type="bool">
+            <default>true</default>
+            <label>Enable blur effect</label>
+            <tooltip>If enabled, the wallpaper will be blurred when a window is active</tooltip>
+        </entry>
+        <entry name="BlurRadius" type="int">
+            <default>40</default>
+            <min>1</min>
+            <max>100</max>
+            <label>Blur radius</label>
+            <tooltip>The strength of the blur effect</tooltip>
+        </entry>
+        <entry name="AnimationDuration" type="int">
+            <default>250</default>
+            <min>0</min>
+            <max>1000</max>
+            <label>Animation duration</label>
+            <tooltip>The duration of the blur animation in milliseconds</tooltip>
+        </entry>
+    </group>
+</kcfg>

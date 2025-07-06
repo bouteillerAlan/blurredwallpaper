@@ -1,6 +1,7 @@
 import QtQuick
 import org.kde.plasma.core as PlasmaCore
 import org.kde.taskmanager as TaskManager
+import org.kde.plasma.workspace.components as WorkspaceComponents
 
 Item {
     id: windowTracker
@@ -30,6 +31,7 @@ Item {
 
         // Use connections to monitor active task changes
         onDataChanged: (topLeft, bottomRight, roles) => {
+            test();
             countVisibleTasks();
             if (roles.includes(TaskManager.AbstractTasksModel.IsActive)) {
                 updateActiveTask();
@@ -80,6 +82,10 @@ Item {
                 }
             }
             activeTask = null;
+        }
+
+        function test() {
+            console.log("@@@@@", JSON.stringify(WorkspaceComponents))
         }
 
         Component.onCompleted: updateActiveTask()

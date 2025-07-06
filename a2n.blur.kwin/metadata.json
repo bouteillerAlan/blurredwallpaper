@@ -1,0 +1,25 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "a2n@example.com",
+                "Name": "a2n"
+            }
+        ],
+        "Description": "Blur the wallpaper when a window is active",
+        "EnabledByDefault": true,
+        "Icon": "preferences-system-windows",
+        "Id": "a2n.blur.kwin",
+        "License": "GPL-2.0-or-later",
+        "Name": "Active Blur (KWin)",
+        "Version": "1.0",
+        "Website": "https://github.com/bouteillerAlan/blurredwallpaper"
+    },
+    "X-KDE-ConfigModule": "kwin/effects/configs/kcm_kwin4_genericscripted",
+    "X-KDE-PluginKeyword": "a2n.blur.kwin",
+    "X-KDE-ServiceTypes": [
+        "KWin/Effect"
+    ],
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}
