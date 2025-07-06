@@ -25,9 +25,8 @@ ColumnLayout {
     property var configDialog
     property var wallpaperConfiguration: wallpaper.configuration
     property var parentLayout
-    property var screen : Screen
-    property var screenSize: !!screen.geometry ? Qt.size(screen.geometry.width, screen.geometry.height):  Qt.size(screen.width, screen.height)
-    
+    property var screenSize: Qt.size(Screen.width, Screen.height)
+
     property alias cfg_Color: colorButton.color
     property color cfg_ColorDefault
     property string cfg_Image
@@ -59,21 +58,18 @@ ColumnLayout {
      */
     signal wallpaperBrowseCompleted();
 
-    signal slideshowStateChanged(bool isChecked);
-    
-    onScreenChanged: function() {
+    onScreenSizeChanged: function() {
         if (thumbnailsLoader.item) {
-            thumbnailsLoader.item.screenSize = !!root.screen.geometry ? Qt.size(root.screen.geometry.width, root.screen.geometry.height):  Qt.size(root.screen.width, root.screen.height);
+            thumbnailsLoader.item.screenSize = root.screenSize;
         }
     }
-    
+
     function saveConfig() {
-        // added imageWallpaper.wallpaperModel to avoid a undefined
-        // when the user change between slideshow and image
-        if (!cfg_IsSlideshow && imageWallpaper.wallpaperModel) {
+        if (configDialog.currentWallpaper === "org.kde.image") {
             imageWallpaper.wallpaperModel.commitAddition();
             imageWallpaper.wallpaperModel.commitDeletion();
         }
+        wallpaperConfiguration.PreviewImage = "null"; // internal, no need to save to file
     }
 
     function openChooserDialog() {
@@ -87,7 +83,7 @@ ColumnLayout {
         renderingMode: (!cfg_IsSlideshow) ? PlasmaWallpaper.ImageBackend.SingleImage : PlasmaWallpaper.ImageBackend.SlideShow
         targetSize: {
             // Lock screen configuration case
-            return Qt.size(root.screenSize.width * root.screen.devicePixelRatio, root.screenSize.height * root.screen.devicePixelRatio)
+            return Qt.size(root.screenSize.width * Screen.devicePixelRatio, root.screenSize.height * Screen.devicePixelRatio)
         }
         onSlidePathsChanged: cfg_SlidePaths = slidePaths
         onUncheckedSlidesChanged: cfg_UncheckedSlides = uncheckedSlides
@@ -135,26 +131,26 @@ ColumnLayout {
 
         QtControls2.ComboBox {
             id: resizeComboBox
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_org.kde.image", "Positioning:")
+            Kirigami.FormData.label: i18ndc("plasma_wallpaper_org.kde.image", "@label:listbox", "Positioning:")
             model: [
                         {
-                            'label': i18nd("plasma_wallpaper_org.kde.image", "Scaled and Cropped"),
+                            'label': i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Scaled and cropped"),
                             'fillMode': Image.PreserveAspectCrop
                         },
                         {
-                            'label': i18nd("plasma_wallpaper_org.kde.image", "Scaled"),
+                            'label': i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Scaled"),
                             'fillMode': Image.Stretch
                         },
                         {
-                            'label': i18nd("plasma_wallpaper_org.kde.image", "Scaled, Keep Proportions"),
+                            'label': i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Scaled, keep proportions"),
                             'fillMode': Image.PreserveAspectFit
                         },
                         {
-                            'label': i18nd("plasma_wallpaper_org.kde.image", "Centered"),
+                            'label': i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Centered"),
                             'fillMode': Image.Pad
                         },
                         {
-                            'label': i18nd("plasma_wallpaper_org.kde.image", "Tiled"),
+                            'label': i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Tiled"),
                             'fillMode': Image.Tile
                         }
             ]

@@ -48,6 +48,7 @@ WallpaperItem {
             // Save drag and drop result
             root.configuration.SlidePaths = imageWallpaper.slidePaths;
         }
+        root.configuration.writeConfig();
     }
 
     contextualActions: [
