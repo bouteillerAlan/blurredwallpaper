@@ -23,7 +23,8 @@ Blur the wallpaper if a windows is active.
     - add color and blur option in function of the positioning
 - give you the ability to deactivate the effect
 - give you the ability to change the blur radius and the animation delay
-- `new` the slideshow wallpaper type is available too
+- the slideshow wallpaper type is available too
+- `new` now you can also darken the wallpaper and choose the color and the transparency of this effect
 
 ### history
 
@@ -51,12 +52,15 @@ Go here: [https://github.com/bouteillerAlan/plasma6-wallpapers-blurredwallpaper-
 
 ## Configuration
 
-| Name        | Description                                                      | Result                                                       |
-|-------------|------------------------------------------------------------------|--------------------------------------------------------------|
-| Active Blur | If you want the effect or not                                    | The effect is active or not                                  |
-| Slideshow   | If you want your wallpaper to be in slideshow             | Your wallpaper is a slideshow or a single image         |
-| Blur Radius | Give you the possibility to customize the blur radius            | The blur is stronger or weaker                               |
-| showDesktop | Give you the possibility to customize the delay of the animation | The blur appears and disappears more quickly or less quickly |
+| Name              | Description                                                                | Result                                                       |
+|-------------------|----------------------------------------------------------------------------|--------------------------------------------------------------|
+| Active Blur       | If you want the effect or not                                              | The effect is active or not                                  |
+| Slideshow         | If you want your wallpaper to be in slideshow                              | Your wallpaper is a slideshow or a single image              |
+| Blur Radius       | Give you the possibility to customize the blur radius                      | The blur is stronger or weaker                               |
+| Animation Delay   | Give you the possibility to customize the delay of the animation           | The blur appears and disappears more quickly or less quickly |
+| Active Color      | If you want the darken effect or not                                       | The color effect is activated or not                         |
+| Color transparency | Give you the possibility to customize the color transparency               | The darken color is more or less transparent                 |
+| Color | Give you the possibility to customize the color of the Active Color option | The darken color is red if you choose red for example        |
 
 ![pres](assets/main-screenshot.png)
 
