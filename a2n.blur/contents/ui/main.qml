@@ -19,23 +19,39 @@ import QtQml.Models
 WallpaperItem {
     id: root
 
-    //property bool isAnyWindowActive: Application.active
-    readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
-    property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
+  //property bool isAnyWindowActive: Application.active
+  readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
+  property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
 
-    TaskManager.ActivityInfo { id: activityInfo }
-    TaskManager.VirtualDesktopInfo { id: virtualDesktopInfo }
+  // NEW: Alternative window focus detection
+  readonly property bool hasActiveWindowFocus: windowFocusDetector.hasActiveWindow
 
-    Loader {
-        id: windowInfoLoader
-        sourceComponent: tasksModel
-        Component {
-            id: tasksModel
-            TasksModel {}
-        }
+  TaskManager.ActivityInfo { id: activityInfo }
+  TaskManager.VirtualDesktopInfo { id: virtualDesktopInfo }
+
+  Loader {
+    id: windowInfoLoader
+    sourceComponent: tasksModel
+    Component {
+      id: tasksModel
+      TasksModel {}
+    }
+  }
+
+  // NEW: Window focus detector component
+  WindowFocusDetector {
+    id: windowFocusDetector
+
+    onWindowFocusChanged: function(hasActive) {
+      console.log("Window focus changed:", hasActive);
     }
 
-    // used by WallpaperInterface for drag and drop
+    onActiveWindowChanged: function(windowInfo) {
+      console.log("Active window changed:", windowInfo.resourceClass || "unknown");
+    }
+  }
+
+  // used by WallpaperInterface for drag and drop
     onOpenUrlRequested: (url) => {
         if (!root.configuration.IsSlideshow) {
             const result = imageWallpaper.addUsersWallpaper(url);
@@ -107,6 +123,7 @@ WallpaperItem {
         wallpaperInterface: root
 
       // Add a FastBlur effect to the wallpaper
+      // MODIFIED: Use alternative window focus detection
       layer.enabled: root.configuration.ActiveBlur || root.configuration.ActiveColor
       layer.effect: Item {
         anchors.fill: parent
@@ -115,7 +132,8 @@ WallpaperItem {
           id: activeBlur
           visible: root.configuration.ActiveBlur
           anchors.fill: parent
-          radius: isAnyWindowActive ? 0 : root.configuration.BlurRadius
+          // MODIFIED: Use both detection methods for better reliability
+          radius: (isAnyWindowActive || hasActiveWindowFocus) ? 0 : root.configuration.BlurRadius
           source: sourceWallpaper
           // animate the blur apparition
           Behavior on radius {
@@ -130,7 +148,8 @@ WallpaperItem {
           visible: root.configuration.ActiveColor
           anchors.fill: parent
           color: root.configuration.ActiveColorColor
-          opacity: isAnyWindowActive ? 0 : root.configuration.ActiveColorTransparency / 100
+          // MODIFIED: Use both detection methods for better reliability
+          opacity: (isAnyWindowActive || hasActiveWindowFocus) ? 0 : root.configuration.ActiveColorTransparency / 100
           source: root.configuration.ActiveBlur ? activeBlur : sourceWallpaper
           // animate the color apparition
           Behavior on opacity {
@@ -141,7 +160,7 @@ WallpaperItem {
         }
       }
 
-        Wallpaper.ImageBackend {
+      Wallpaper.ImageBackend {
             id: imageWallpaper
 
             // Not using root.configuration.Image to avoid binding loop warnings
