@@ -19,37 +19,42 @@ import QtQml.Models
 WallpaperItem {
     id: root
 
-    //property bool isAnyWindowActive: Application.active
-    readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
-    property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
+  property bool isAnyWindowActive: false
 
     TaskManager.ActivityInfo { id: activityInfo }
     TaskManager.VirtualDesktopInfo { id: virtualDesktopInfo }
 
-    Loader {
-        id: windowInfoLoader
-        sourceComponent: tasksModel
-        Component {
-            id: tasksModel
-            TasksModel {}
-        }
+  Loader {
+    id: windowInfoLoader
+    sourceComponent: tasksModel
+    Component {
+      id: tasksModel
+      TasksModel {}
     }
+  }
 
-    // used by WallpaperInterface for drag and drop
-    onOpenUrlRequested: (url) => {
-        if (!root.configuration.IsSlideshow) {
-            const result = imageWallpaper.addUsersWallpaper(url);
-            if (result.length > 0) {
-                // Can be a file or a folder (KPackage)
-                root.configuration.Image = result;
-            }
-        } else {
-            imageWallpaper.addSlidePath(url);
-            // Save drag and drop result
-            root.configuration.SlidePaths = imageWallpaper.slidePaths;
-        }
-        root.configuration.writeConfig();
+  Connections {
+    target: windowInfoLoader.item
+    function onWindowActivated(active) {
+      root.isAnyWindowActive = !active
     }
+  }
+
+  // used by WallpaperInterface for drag and drop
+  onOpenUrlRequested: (url) => {
+    if (!root.configuration.IsSlideshow) {
+      const result = imageWallpaper.addUsersWallpaper(url);
+      if (result.length > 0) {
+        // Can be a file or a folder (KPackage)
+        root.configuration.Image = result;
+      }
+    } else {
+      imageWallpaper.addSlidePath(url);
+      // Save drag and drop result
+      root.configuration.SlidePaths = imageWallpaper.slidePaths;
+    }
+    root.configuration.writeConfig();
+  }
 
     contextualActions: [
         PlasmaCore.Action {
@@ -74,11 +79,11 @@ WallpaperItem {
         }
     }
 
-    Component.onCompleted: {
-        // In case plasmashell crashes when the config dialog is opened
-        root.configuration.PreviewImage = "null";
-        root.loading = true; // delays ksplash until the wallpaper has been loaded
-    }
+  Component.onCompleted: {
+    // In case plasmashell crashes when the config dialog is opened
+    root.configuration.PreviewImage = "null";
+    root.loading = true; // delays ksplash until the wallpaper has been loaded
+  }
 
     Image {
       id: sourceWallpaper

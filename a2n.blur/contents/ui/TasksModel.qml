@@ -1,50 +1,87 @@
 import QtQuick
 import QtQml.Models
 import QtQuick.Window
+import org.kde.plasma.core as PlasmaCore
 import org.kde.taskmanager as TaskManager
-import org.kde.kwindowsystem as Kwin
 
 Item {
-    id: plasmaTasksItem
+  id: plasmaTasksItem
 
-    readonly property bool existsWindowActive: root.activeTaskItem && tasksRepeater.count > 0 && activeTaskItem.isActive
-    property Item activeTaskItem: null
+  signal windowActivated(bool active)
 
-    TaskManager.TasksModel {
-        id: tasksModel
-        sortMode: TaskManager.TasksModel.SortVirtualDesktop
-        groupMode: TaskManager.TasksModel.GroupDisabled
-        activity: activityInfo.currentActivity
-        virtualDesktop: virtualDesktopInfo.currentDesktop
-        // filterByVirtualDesktop: true
-        // filterByActivity: true
-        // filterByScreen: true
+  readonly property bool existsWindowActive: root.activeTaskItem && tasksRepeater.count > 0 && activeTaskItem.isActive
+  property Item activeTaskItem: null
+
+  TaskManager.TasksModel {
+    id: tasksModel
+    sortMode: TaskManager.TasksModel.SortVirtualDesktop
+    groupMode: TaskManager.TasksModel.GroupDisabled
+    activity: activityInfo.currentActivity
+    virtualDesktop: virtualDesktopInfo.currentDesktop
+    filterByVirtualDesktop: true
+    filterByActivity: true
+    filterByScreen: true
+    filterHidden: false
+    filterMinimized: false
+    filterNotMaximized: false
+    filterNotMinimized: false
+
+    onDataChanged: {
+      console.log("TasksModel data changed - logging all windows")
     }
 
-    Item {
-        id: taskList
+    onActiveTaskChanged: {
+      console.log("TasksModel signal: activeTaskChanged", activeTask)
+    }
 
-        Repeater {
-            id: tasksRepeater
-            model: tasksModel
+    onCountChanged: {
+      console.log("TasksModel signal: countChanged to", count)
+    }
+  }
 
-            Item {
-                id: task
-                readonly property bool isActive: model.IsActive
-                readonly property string windowTitle: model.display
-                readonly property var windowTypes: model.windowTypes
+  Item {
+    id: taskList
+    Repeater {
+      id: tasksRepeater
+      model: tasksModel
+      Item {
+        id: task
+        readonly property bool isActive: model.IsActive
+        readonly property string windowTitle: model.display
+        readonly property var windowTypes: model.windowTypes
 
-                onIsActiveChanged: {
-
-                    console.log(model.AppId, 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
-                    const arr = ['hasModelChildren', 'ChildCount', 'IsFullScreenable', 'IsLauncher', 'IsResizable', 'IsClosable', 'AppId', 'IsActive', 'IsWindow', 'StackingOrder']
-                    arr.forEach((v) => {
-                        console.log(`${v}: ${model[v]}`)
-                    })
-
-                    if (isActive) plasmaTasksItem.activeTaskItem = task
-                }
-            }
+        onIsActiveChanged: {
+          /** @type {TasksModelItem} */
+          const typedModel = model;
+          console.log(`A2N.BLUR ~ onIsActiveChanged ${JSON.stringify({
+            appName: typedModel.AppName,
+            appId: typedModel.AppId,
+            appPid: typedModel.AppPid,
+            windowTitle: typedModel.display,
+            isActive: typedModel.IsActive,
+            isMinimized: typedModel.IsMinimized,
+            isMaximized: typedModel.IsMaximized,
+            isFullScreen: typedModel.IsFullScreen,
+            geometry: typedModel.Geometry,
+            stackingOrder: typedModel.StackingOrder,
+            activities: typedModel.Activities,
+            virtualDesktops: typedModel.VirtualDesktops,
+            isOnAllVirtualDesktops: typedModel.IsOnAllVirtualDesktops,
+            genericName: typedModel.GenericName,
+            windowTypes: typedModel.windowTypes,
+            lastActivated: typedModel.LastActivated,
+            decoration: typedModel.decoration,
+            IsWindow: typedModel.IsWindow,
+            IsMovable: typedModel.IsMovable,
+            IsKeepAbove: typedModel.IsKeepAbove,
+            IsLauncher: typedModel.IsLauncher,
+            IsFullScreenable: typedModel.IsFullScreenable
+          }, null, 2)}`)
+          windowActivated(isActive ?? false)
+          if (isActive) plasmaTasksItem.activeTaskItem = task
         }
+        Component.onCompleted: {}
+      }
     }
+  }
 }
