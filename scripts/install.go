@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -35,6 +36,12 @@ type CopyProgress struct {
 	CopiedSize  int64
 }
 
+type Metadata struct {
+	KPlugin struct {
+		ID string `json:"Id"`
+	} `json:"KPlugin"`
+}
+
 // wallpaper applet related flags
 var installWallpaper = flag.Bool("w", false, "Install wallpaper plugin")
 var wallpaperSource = flag.String("ws", "a2n.blur", "Wallpaper source folder (absolute path)")
@@ -42,7 +49,7 @@ var wallpaperTarget = flag.String("wt", "/home/a2n/.local/share/plasma/wallpaper
 
 // kwin-script related flags
 var installKwinScript = flag.Bool("k", false, "Pack and install kwin script")
-var kwinScriptSource = flag.String("ks", "a2n.blur.ks", "kwinScript source folder (absolute path)")
+var kwinScriptSource = flag.String("ks", "a2n.blur.ks/a2n.windowSignal", "kwinScript source folder (absolute path)")
 
 // qol related flags
 var restart = flag.Bool("r", false, "Restart plasma after install")
@@ -224,16 +231,38 @@ func copyFolder(src string, dst string, progress chan<- CopyProgress) error {
 func launchInstallKwinScript() {
 	log(Info, "Installing kwin script")
 
-	if _, err := execCmd("kpackagetool6 --type=KWin/Script -i " + *kwinScriptSource); err != nil {
+	log(Info, "Uninstall old kwin script")
+	metadataPath := filepath.Join(*kwinScriptSource, "metadata.json")
+	data, err := os.ReadFile(metadataPath)
+	if err != nil {
+		log(Error, fmt.Sprintf("Failed to read metadata.json: %v", err))
+	}
+	var metadata Metadata
+	err = json.Unmarshal(data, &metadata)
+	if err != nil {
+		log(Error, fmt.Sprintf("Failed to parse metadata.json: %v", err))
+	}
+	if _, err := execCmd("kpackagetool6 --type=KWin/Script -r " + metadata.KPlugin.ID); err != nil {
+		log(Error, fmt.Sprintf("Failed to uninstall kwinScript: %v", err), false)
+	}
+
+	log(Info, "Package kwin script")
+	srcPath := filepath.Dir(*kwinScriptSource)
+	parentDir := filepath.Base(srcPath)
+	distPath := filepath.Join(parentDir, "dist")
+	outputFile := filepath.Join(distPath, metadata.KPlugin.ID+".kwinscript")
+	if _, err := execCmd("zip -r " + outputFile + " " + *kwinScriptSource); err != nil {
 		log(Error, fmt.Sprintf("Failed to package kwinScript: %v", err))
 	}
 
-	scriptName := filepath.Base(*kwinScriptSource)
-	if _, err := execCmd("kwriteconfig6 --file kwinrc --group Plugins --key" + scriptName + "Enabled true"); err != nil {
+	// fixme: the check and reload dosent work atm
+	log(Info, "Enable kwin script")
+	if _, err := execCmd("kwriteconfig6 --file kwinrc --group Plugins --key " + metadata.KPlugin.ID + "Enabled true"); err != nil {
 		log(Error, fmt.Sprintf("Failed to enable kwinScript: %v", err))
 	}
 
-	if _, err := execCmd("qdbus org.kde.KWin /KWin reconfigure"); err != nil {
+	log(Info, "Reload kwin")
+	if _, err := execCmd("qdbus6 org.kde.KWin /KWin reconfigure"); err != nil {
 		log(Error, fmt.Sprintf("Failed to reload kwin: %v", err))
 	}
 
