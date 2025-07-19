@@ -4,20 +4,27 @@ import QtQuick.Window
 import org.kde.plasma.core as PlasmaCore
 import org.kde.taskmanager as TaskManager
 
+import "../services" as Services
+
 Item {
   id: plasmaTasksItem
 
-  signal windowActivated(bool active)
+  Services.Cmd {
+    id: cmd
+    onExited: function(cmd, exitCode, exitStatus, stdout, stderr) {
+      console.log("Command finished:", cmd)
+      console.log("Exit code:", exitCode)
+      console.log("Stdout:", stdout)
+      console.log("Stderr:", stderr)
+    }
+  }
 
-  readonly property bool existsWindowActive: root.activeTaskItem && tasksRepeater.count > 0 && activeTaskItem.isActive
-  property Item activeTaskItem: null
+  signal windowActivated(bool active)
 
   TaskManager.TasksModel {
     id: tasksModel
     sortMode: TaskManager.TasksModel.SortVirtualDesktop
     groupMode: TaskManager.TasksModel.GroupDisabled
-    activity: activityInfo.currentActivity
-    virtualDesktop: virtualDesktopInfo.currentDesktop
     filterByVirtualDesktop: true
     filterByActivity: true
     filterByScreen: true
@@ -26,62 +33,22 @@ Item {
     filterNotMaximized: false
     filterNotMinimized: false
 
-    onDataChanged: {
-      console.log("TasksModel data changed - logging all windows")
-    }
+    onDataChanged: {console.log("A2N.BLUR ~ TasksModel data changed")}
+    onCountChanged: {console.log("A2N.BLUR ~ TasksModel count changed to ", count)}
 
     onActiveTaskChanged: {
-      console.log("TasksModel signal: activeTaskChanged", activeTask)
-    }
-
-    onCountChanged: {
-      console.log("TasksModel signal: countChanged to", count)
+      console.log("A2N.BLUR ~ TasksModel onActiveTaskChanged")
+      const isActive = tasksModel.data(activeTask, TaskManager.TasksModel.IsActive)
+      if (isActive) {
+        windowActivated(!!isActive)
+      } else {
+        // call dbus
+        cmd.exec('echo "@@@@@@@@@@@@@@@@@ pouet"')
+      }
     }
   }
 
-  Item {
-    id: taskList
-    Repeater {
-      id: tasksRepeater
-      model: tasksModel
-      Item {
-        id: task
-        readonly property bool isActive: model.IsActive
-        readonly property string windowTitle: model.display
-        readonly property var windowTypes: model.windowTypes
-
-        onIsActiveChanged: {
-          /** @type {TasksModelItem} */
-          const typedModel = model;
-          console.log(`A2N.BLUR ~ onIsActiveChanged ${JSON.stringify({
-            appName: typedModel.AppName,
-            appId: typedModel.AppId,
-            appPid: typedModel.AppPid,
-            windowTitle: typedModel.display,
-            isActive: typedModel.IsActive,
-            isMinimized: typedModel.IsMinimized,
-            isMaximized: typedModel.IsMaximized,
-            isFullScreen: typedModel.IsFullScreen,
-            geometry: typedModel.Geometry,
-            stackingOrder: typedModel.StackingOrder,
-            activities: typedModel.Activities,
-            virtualDesktops: typedModel.VirtualDesktops,
-            isOnAllVirtualDesktops: typedModel.IsOnAllVirtualDesktops,
-            genericName: typedModel.GenericName,
-            windowTypes: typedModel.windowTypes,
-            lastActivated: typedModel.LastActivated,
-            decoration: typedModel.decoration,
-            IsWindow: typedModel.IsWindow,
-            IsMovable: typedModel.IsMovable,
-            IsKeepAbove: typedModel.IsKeepAbove,
-            IsLauncher: typedModel.IsLauncher,
-            IsFullScreenable: typedModel.IsFullScreenable
-          }, null, 2)}`)
-          windowActivated(isActive ?? false)
-          if (isActive) plasmaTasksItem.activeTaskItem = task
-        }
-        Component.onCompleted: {}
-      }
-    }
+  Component.onCompleted: {
+    console.log("A2N.BLUR ~ TasksModel onCompleted")
   }
 }
