@@ -1,0 +1,20 @@
+{
+  "KPackageStructure": "KWin/Script",
+  "X-Plasma-API": "javascript",
+  "X-Plasma-MainScript": "contents/code/main.js",
+  "KPlugin": {
+    "Name": "Window Signal",
+    "Description": "Sends signals when windows are focused or not",
+    "Icon": "preferences-system-windows",
+    "Authors": [
+      {
+        "Email": "a2n.dev@pm.me",
+        "Name": "Bouteiller A2N Alan"
+      }
+    ],
+    "Id": "a2n.windowSignal",
+    "Version": "1.0",
+    "License": "MIT",
+    "Website": "https://github.com/example/window-signal"
+  }
+}
