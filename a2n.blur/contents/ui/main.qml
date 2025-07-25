@@ -19,7 +19,8 @@ import QtQml.Models
 WallpaperItem {
   id: root
 
-  property bool isAnyWindowActive: false
+  readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
+  property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
 
   Loader {
     id: windowInfoLoader
@@ -27,13 +28,6 @@ WallpaperItem {
     Component {
       id: tasksModel
       TasksModel {}
-    }
-  }
-
-  Connections {
-    target: windowInfoLoader.item
-    function onWindowActivated(active) {
-      root.isAnyWindowActive = active
     }
   }
 
