@@ -229,7 +229,7 @@ func copyFolder(src string, dst string, progress chan<- CopyProgress) error {
 
 // package, installs and enables a KWin script, then reloads KWin for the changes to take effect
 func launchInstallKwinScript() {
-	log(Info, "Installing kwin script")
+	log(Info, "Pack and install kwin script")
 
 	log(Info, "Uninstall old kwin script")
 	metadataPath := filepath.Join(*kwinScriptSource, "metadata.json")
@@ -242,6 +242,7 @@ func launchInstallKwinScript() {
 	if err != nil {
 		log(Error, fmt.Sprintf("Failed to parse metadata.json: %v", err))
 	}
+	log(Info, "Id find "+metadata.KPlugin.ID)
 	if _, err := execCmd("kpackagetool6 --type=KWin/Script -r " + metadata.KPlugin.ID); err != nil {
 		log(Error, fmt.Sprintf("Failed to uninstall kwinScript: %v", err), false)
 	}
@@ -250,9 +251,15 @@ func launchInstallKwinScript() {
 	srcPath := filepath.Dir(*kwinScriptSource)
 	parentDir := filepath.Base(srcPath)
 	distPath := filepath.Join(parentDir, "dist")
-	outputFile := filepath.Join(distPath, metadata.KPlugin.ID+".kwinscript")
+	kwinFile := metadata.KPlugin.ID + ".kwinscript"
+	outputFile := filepath.Join(distPath, kwinFile)
 	if _, err := execCmd("zip -r " + outputFile + " " + *kwinScriptSource); err != nil {
 		log(Error, fmt.Sprintf("Failed to package kwinScript: %v", err))
+	}
+
+	log(Info, "Install kwin script")
+	if _, err := execCmd("kpackagetool6 --type=KWin/Script -i " + *kwinScriptSource); err != nil {
+		log(Error, fmt.Sprintf("Failed to install kwinScript: %v", err), false)
 	}
 
 	// fixme: the check and reload dosent work atm

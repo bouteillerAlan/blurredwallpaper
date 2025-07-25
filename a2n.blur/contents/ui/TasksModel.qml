@@ -42,7 +42,7 @@ Item {
       if (isActive) {
         windowActivated(!!isActive)
       } else {
-        // call dbus
+        // call dbus and check if something isActive or alike
         cmd.exec('echo "@@@@@@@@@@@@@@@@@ pouet"')
       }
     }
