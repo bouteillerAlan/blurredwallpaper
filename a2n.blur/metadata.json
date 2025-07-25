@@ -1,6 +1,7 @@
 {
     "KPackageStructure": "Plasma/Wallpaper",
     "KPlugin": {
+        "Version": "3.4.0",
         "Authors": [
             {
                 "Email": "a2n.dev@pm.me",

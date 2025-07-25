@@ -1,3 +1,8 @@
+## V3.4
+ - Fix the delete bouton on wallpaper
+ - Fix the dim effect not loading correctly
+ - Add version number to the metadata.json
+
 ## V3.3
  - Fix the code for KDE 6.4
  - Add an option to also darken the wallpaper
