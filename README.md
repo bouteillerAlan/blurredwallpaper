@@ -74,13 +74,15 @@ See the following file :
 - [changelog](CHANGELOG)
 - [security](SECURITY.md)
 
-## Roadmap
-
-- bug : see issue #25 for the desync when user switch between img and slideshow
-
 ## Want to participate? Have a bug or a request feature?
 
 Do not hesitate to open a pr or an issue. I reply when I can.
+
+### Another cool project to check (wallpaper/blur related)
+
+- [Plasma 6 Wallpaper plugin to play videos on the Desktop/Lock Screen](https://github.com/luisbocanegra/plasma-smart-video-wallpaper-reborn)
+- [Plasma Widget to enable Active Blur and other effects in front of all Wallpaper Plugins](https://github.com/luisbocanegra/plasma-wallpaper-effects)
+- [Better Blur, a fork of the Plasma 6 blur effect with additional features and bug fixes](https://github.com/taj-ny/kwin-effects-forceblur)
 
 ## Want to support my work?
 

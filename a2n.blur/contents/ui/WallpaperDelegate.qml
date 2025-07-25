@@ -38,20 +38,20 @@ KCM.GridDelegate {
       tooltip: i18nd("plasma_wallpaper_org.kde.image", "Restore wallpaper")
       onTriggered: model.pendingDeletion = false
     },
-  Kirigami.Action {
-    icon.name: "edit-delete"
-    tooltip: i18nd("plasma_wallpaper_org.kde.image", "Remove Wallpaper")
-    visible: model.removable && !model.pendingDeletion && configDialog.currentWallpaper == "org.kde.image"
-    onTriggered: {
-      model.pendingDeletion = true;
-      if (wallpapersGrid.view.currentIndex === index) {
-        const newIndex = (index + 1) % (imageModel.count - 1);
-        wallpapersGrid.view.itemAtIndex(newIndex).clicked();
+    Kirigami.Action {
+      icon.name: "edit-delete"
+      tooltip: i18nd("plasma_wallpaper_org.kde.image", "Remove Wallpaper")
+      visible: model.removable && !model.pendingDeletion && !cfg_IsSlideshow
+      onTriggered: {
+        model.pendingDeletion = true;
+        if (wallpapersGrid.view.currentIndex === index) {
+          const newIndex = (index + 1) % (imageModel.count - 1);
+          wallpapersGrid.view.itemAtIndex(newIndex).clicked();
+        }
+        root.configurationChanged(); // BUG 438585
       }
-      root.configurationChanged(); // BUG 438585
     }
-  }
-]
+  ]
 
 thumbnail: Rectangle {
   id: backgroundRect
