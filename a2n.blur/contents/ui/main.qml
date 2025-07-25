@@ -19,6 +19,7 @@ import QtQml.Models
 WallpaperItem {
   id: root
 
+  // BLUR CODE ----------------------------
   readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
   property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
 
@@ -30,6 +31,7 @@ WallpaperItem {
       TasksModel {}
     }
   }
+  // BLUR CODE ----------------------------
 
   // used by WallpaperInterface for drag and drop
   onOpenUrlRequested: (url) => {
@@ -76,12 +78,21 @@ Component.onCompleted: {
   root.loading = true; // delays ksplash until the wallpaper has been loaded
 }
 
-Image {
-  id: sourceWallpaper
+// BLUR CODE ----------------------------
+Rectangle {
   anchors.fill: parent
-  fillMode: Image.PreserveAspectCrop
-  source: imageView.source
+  //color: Qt.rgba(0, 0, 0, isAnyWindowActive ? 0.0 : 0.8)
+  color: root.configuration.ActiveColorColor
+  opacity: isAnyWindowActive ? 0 : root.configuration.ActiveColorTransparency / 100
+  z: 9999 // make sure it’s on top
+  visible: root.configuration.ActiveColor
+  Behavior on color {
+    ColorAnimation {
+      duration: root.configuration.AnimationDuration
+    }
+  }
 }
+// BLUR CODE ----------------------------
 
 ImageStackView {
   id: imageView
@@ -102,40 +113,24 @@ ImageStackView {
   sourceSize: Qt.size(root.width * Screen.devicePixelRatio, root.height * Screen.devicePixelRatio)
   wallpaperInterface: root
 
-  // Add a FastBlur effect to the wallpaper
-  layer.enabled: root.configuration.ActiveBlur || root.configuration.ActiveColor
-  layer.effect: Item {
+  // BLUR CODE ----------------------------
+  layer.enabled: root.configuration.ActiveBlur
+  layer.effect: FastBlur {
+    id: activeBlurLayer
     anchors.fill: parent
-
-    FastBlur {
-      id: activeBlur
-      visible: root.configuration.ActiveBlur
+    radius: isAnyWindowActive ? 0 : root.configuration.BlurRadius
+    source: Image {
       anchors.fill: parent
-      radius: isAnyWindowActive ? 0 : root.configuration.BlurRadius
-      source: sourceWallpaper
-      // animate the blur apparition
-      Behavior on radius {
-        NumberAnimation {
-          duration: root.configuration.AnimationDuration
-        }
-      }
+      fillMode: Image.PreserveAspectCrop
+      source: imageView.source
     }
-
-    ColorOverlay {
-      id: activeColor
-      visible: root.configuration.ActiveColor
-      anchors.fill: parent
-      color: root.configuration.ActiveColorColor
-      opacity: isAnyWindowActive ? 0 : root.configuration.ActiveColorTransparency / 100
-      source: root.configuration.ActiveBlur ? activeBlur : sourceWallpaper
-      // animate the color apparition
-      Behavior on opacity {
-        NumberAnimation {
-          duration: root.configuration.AnimationDuration
-        }
+    Behavior on radius {
+      NumberAnimation {
+        duration: root.configuration.AnimationDuration
       }
     }
   }
+  // BLUR CODE ----------------------------
 
   Wallpaper.ImageBackend {
     id: imageWallpaper
