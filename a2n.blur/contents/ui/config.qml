@@ -68,7 +68,7 @@ ColumnLayout {
     }
 
     function saveConfig() {
-        if (configDialog.currentWallpaper === "org.kde.image") {
+        if (configDialog.currentWallpaper === "a2n.blur") {
             imageWallpaper.wallpaperModel.commitAddition();
             imageWallpaper.wallpaperModel.commitDeletion();
         }
