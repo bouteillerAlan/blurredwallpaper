@@ -34,10 +34,13 @@
       <default>#000</default>
     </entry>
     <entry name="AnimationDuration" type="int">
-      <label>How quickly the change takes effect.</label>
+      <label>How quickly the blur change takes effect.</label>
       <default>400</default>
     </entry>
-
+    <entry name="AnimationDurationColor" type="int">
+      <label>How quickly the color change takes effect.</label>
+      <default>400</default>
+    </entry>
 
     <entry name="Blur" type="bool">
       <label>Blur background filling</label>

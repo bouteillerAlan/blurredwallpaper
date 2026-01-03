@@ -1,3 +1,8 @@
+## V3.5
+ - Thanks to Al-Bor3y the delete button is now functional
+ - The dim effect should now be working correctly
+ - The dim effect have, now, is hown transition duration
+
 ## V3.4
  - Fix the delete bouton on wallpaper
  - Fix the dim effect not loading correctly

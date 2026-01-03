@@ -103,6 +103,7 @@ thumbnail: Rectangle {
         sourceSize: previewImage.sourceSize
         anchors.fill: parent
       }
+
       // animate the blur apparition
       Behavior on radius {
         NumberAnimation {
@@ -120,10 +121,10 @@ thumbnail: Rectangle {
     color: cfg_ActiveColorColor
     opacity: (cfg_ActiveColor && wallpaperDelegate.hovered) ? cfg_ActiveColorTransparency / 100 : 0
 
-    // animate the color apparition
     Behavior on opacity {
       NumberAnimation {
-        duration: cfg_AnimationDuration
+        duration: cfg_AnimationDurationColor
+        easing.type: Easing.InOutQuad
       }
     }
   }
