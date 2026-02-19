@@ -154,7 +154,7 @@ Behavior on opacity {
 
 onClicked: {
   if (!cfg_IsSlideshow) {
-    cfg_Image = model.packageName || model.path;
+    cfg_Image = model.source;
     if (typeof wallpaper !== "undefined") {
       wallpaper.configuration.PreviewImage = cfg_Image;
     }
