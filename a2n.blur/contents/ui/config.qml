@@ -69,7 +69,7 @@ ColumnLayout {
   }
 
   function saveConfig() {
-    if (configDialog.currentWallpaper === "a2n.blur") {
+    if (configDialog.currentWallpaper === "a2n.blur" && imageWallpaper.wallpaperModel) {
       imageWallpaper.wallpaperModel.commitAddition();
       imageWallpaper.wallpaperModel.commitDeletion();
     }
@@ -225,9 +225,9 @@ ColumnLayout {
 
     Kirigami.InlineMessage {
       id: alertIsSlideshowChanged
+      visible: activeSlideshowRadioButton.checked
       Layout.fillWidth: true
-      text: "Please hit Apply and reopen this window before doing anything else. <br> <a href=\"https://github.com/bouteillerAlan/blurredwallpaper/issues/25\">If you want to help with this issue, click here!<a/>"
-      onLinkActivated: Qt.openUrlExternally(link)
+      text: "Please hit Apply and reopen this window before doing anything else. If already done you can ignore that message."
       type: Kirigami.MessageType.Error
     }
 

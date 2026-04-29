@@ -21,8 +21,8 @@ KCM.GridDelegate {
   opacity: model.pendingDeletion ? 0.5 : 1
   scale: index, 1 // Workaround for https://bugreports.qt.io/browse/QTBUG-107458
 
-  text: model.display
-  subtitle: model.author
+  text: model.display || ""
+  subtitle: model.author || ""
 
   hoverEnabled: true
 
@@ -34,14 +34,14 @@ KCM.GridDelegate {
     },
     Kirigami.Action {
       icon.name: "edit-undo"
-      visible: model.pendingDeletion
+      visible: model.pendingDeletion === true
       tooltip: i18nd("plasma_wallpaper_org.kde.image", "Restore wallpaper")
       onTriggered: model.pendingDeletion = false
     },
     Kirigami.Action {
       icon.name: "edit-delete"
       tooltip: i18nd("plasma_wallpaper_org.kde.image", "Remove Wallpaper")
-      visible: model.removable && !model.pendingDeletion && !cfg_IsSlideshow
+      visible: (model.removable === true) && !model.pendingDeletion && !cfg_IsSlideshow
       onTriggered: {
         model.pendingDeletion = true;
         if (wallpapersGrid.view.currentIndex === index) {
@@ -87,7 +87,7 @@ thumbnail: Rectangle {
     asynchronous: true
     cache: false
     fillMode: cfg_FillMode
-    source: model.preview
+    source: model.preview || ""
 
     layer.enabled: cfg_ActiveBlur
 
@@ -133,7 +133,7 @@ thumbnail: Rectangle {
     visible: cfg_IsSlideshow
     anchors.right: parent.right
     anchors.top: parent.top
-    checked: visible ? model.checked : false
+    checked: visible ? (model.checked === true) : false
     onToggled: model.checked = checked
   }
 

@@ -122,7 +122,7 @@ WallpaperItem {
       source: Image {
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        source: imageView.source
+        source: imageWallpaper.image
       }
       Behavior on radius {
         NumberAnimation {
