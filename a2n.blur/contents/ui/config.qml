@@ -73,7 +73,9 @@ ColumnLayout {
       imageWallpaper.wallpaperModel.commitAddition();
       imageWallpaper.wallpaperModel.commitDeletion();
     }
-    wallpaperConfiguration.PreviewImage = "null"; // internal, no need to save to file
+    if (wallpaperConfiguration) {
+      wallpaperConfiguration.PreviewImage = "null"; // internal, no need to save to file
+    }
   }
 
   function openChooserDialog() {
