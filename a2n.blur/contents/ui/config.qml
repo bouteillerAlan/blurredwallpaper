@@ -48,13 +48,21 @@ ColumnLayout {
 
   // custom property for the active blur effect
   property alias cfg_ActiveBlur: activeBlurRadioButton.checked
+  property bool cfg_ActiveBlurDefault: true
   property int cfg_AnimationDuration: 400
+  property int cfg_AnimationDurationDefault: 400
   property int cfg_AnimationDurationColor: 400
+  property int cfg_AnimationDurationColorDefault: 400
   property int cfg_BlurRadius: 40
+  property int cfg_BlurRadiusDefault: 40
   property alias cfg_ActiveColor: activeColorRadioButton.checked
+  property bool cfg_ActiveColorDefault: false
   property int cfg_ActiveColorTransparency: 20
+  property int cfg_ActiveColorTransparencyDefault: 20
   property alias cfg_ActiveColorColor: activeColorColorButton.color
+  property color cfg_ActiveColorColorDefault: "#000"
   property alias cfg_IsSlideshow: activeSlideshowRadioButton.checked
+  property bool cfg_IsSlideshowDefault: false
 
   signal configurationChanged()
   /**

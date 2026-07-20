@@ -89,7 +89,6 @@ Item {
 
                 framedView: false
 
-
                 function resetCurrentIndex() {
                     //that min is needed as the module will be populated in an async way
                     //and only on demand so we can't ensure it already exists
@@ -109,7 +108,6 @@ Item {
 
                 view.delegate: WallpaperDelegate {
                     color: cfg_Color
-                    previewSize: Qt.size(thumbnailsComponent.screenSize.width / 8, thumbnailsComponent.screenSize.height / 8)
                 }
             }
         }
