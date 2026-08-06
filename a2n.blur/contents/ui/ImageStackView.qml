@@ -19,7 +19,7 @@ QQC2.StackView {
     required property bool blur
     property alias source: mediaProxy.source
     required property size sourceSize
-    required property QtObject wallpaperInterface
+    required property /*WallpaperItem*/ QtObject wallpaperInterface // weaker type to support mock object in autotests
 
     readonly property alias mediaProxy: mediaProxy
     readonly property url modelImage: mediaProxy.modelImage
@@ -35,6 +35,7 @@ QQC2.StackView {
 
     property Component staticImageComponent
     property Component animatedImageComponent
+    property Component dayNightComponent
 
     onFillModeChanged: Qt.callLater(loadImage);
     onModelImageChanged: Qt.callLater(loadImage);
@@ -55,6 +56,12 @@ QQC2.StackView {
                 animatedImageComponent = Qt.createComponent("mediacomponent/AnimatedImageComponent.qml");
             }
             return animatedImageComponent;
+        }
+        case Wallpaper.BackgroundType.DayNight: {
+            if (!dayNightComponent) {
+                dayNightComponent = Qt.createComponent("mediacomponent/DayNightComponent.qml");
+            }
+            return dayNightComponent;
         }
         }
     }
@@ -85,9 +92,15 @@ QQC2.StackView {
             "sourceSize": view.sourceSize,
             "color": view.configColor,
             "blur": view.blur,
-            "opacity": 0,
             "parent": view,
+            "implicitWidth": view.width,
+            "implicitHeight": view.height,
+            "visible": false,
         });
+        if (!pendingImage) {
+            console.warn(baseImage.errorString());
+            return;
+        }
 
         pendingImage.statusChanged.connect(replaceWhenLoaded);
         replaceWhenLoaded();
@@ -124,14 +137,15 @@ QQC2.StackView {
     }
 
     replaceEnter: Transition {
-        OpacityAnimator {
+        NumberAnimation {
             id: replaceEnterOpacityAnimator
+            property: "opacity"
             from: 0
             to: 1
             // The value is to keep compatible with the old feeling defined by "TransitionAnimationDuration" (default: 1000)
-            // 1 is HACK for https://bugreports.qt.io/browse/QTBUG-106797 to avoid flickering
-            duration: view.doesSkipAnimation ? 1 : Math.round(Kirigami.Units.veryLongDuration * 2.5)
+            duration: Math.round(Kirigami.Units.veryLongDuration * 2.5)
         }
+        enabled: !view.doesSkipAnimation
     }
     // Keep the old image around till the new one is fully faded in
     // If we fade both at the same time you can see the background behind glimpse through
@@ -147,8 +161,8 @@ QQC2.StackView {
 
         targetSize: view.sourceSize
 
-        onActualSizeChanged: Qt.callLater(loadImageImmediately);
-        onColorSchemeChanged: loadImageImmediately();
-        onSourceFileUpdated: loadImageImmediately()
+        onActualSizeChanged: Qt.callLater(view.loadImageImmediately);
+        onColorSchemeChanged: view.loadImageImmediately();
+        onSourceFileUpdated: view.loadImageImmediately()
     }
 }

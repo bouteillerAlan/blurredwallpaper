@@ -13,6 +13,7 @@ import QtQuick.Controls as QQC2
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
 import org.kde.newstuff as NewStuff
+import org.kde.kitemmodels as KItemModels
 
 Item {
     id: thumbnailsComponent
@@ -21,7 +22,35 @@ Item {
     property alias view: wallpapersGrid.view
     property var screenSize: Qt.size(Screen.width, Screen.height)
 
-    readonly property QtObject imageModel: (!cfg_IsSlideshow) ? imageWallpaper.wallpaperModel : imageWallpaper.slideFilterModel
+
+    readonly property QtObject imageModel: (!cfg_IsSlideshow) ? sortedWallpaperModel : imageWallpaper.slideFilterModel
+
+    KItemModels.KSortFilterProxyModel  {
+        id: sortedWallpaperModel
+        sortRole: Qt.DisplayRole
+        sortCaseSensitivity: Qt.CaseInsensitive
+        sortColumn: 0
+        sourceModel: (configDialog.currentWallpaper === "org.kde.image") ? imageWallpaper.wallpaperModel : null
+        function indexOf(image : string) : int {
+            if (!sourceModel) {
+                return -1
+            }
+            const idx = sourceModel.indexOf(image)
+
+            if (idx < 0) {
+                return idx
+            }
+
+            const sourceIndex = sourceModel.index(idx, 0)
+            return mapFromSource(sourceIndex).row
+        }
+        function openContainingFolder(listIndex : int) {
+            if (sourceModel) {
+                sourceModel.openContainingFolder(mapToSource(index(listIndex, 0)).row)
+            }
+        }
+    }
+
 
     Connections {
         target: imageWallpaper
@@ -70,7 +99,26 @@ Item {
                     configFile: Kirigami.Settings.isMobile ? "wallpaper-mobile.knsrc" : "wallpaper.knsrc"
                     text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the new things being gotten are wallpapers", "Get New…")
                     Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Get New Wallpaper Images…")
+                    displayHint: Kirigami.DisplayHint.KeepVisible
                     viewMode: NewStuff.Page.ViewMode.Preview
+                },
+                Kirigami.Action {
+                    icon.name: "edit-select-all-symbolic"
+                    shortcut: StandardKey.SelectAll
+                    text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the things being selected are wallpapers", "Select All")
+                    Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Select All Slides")
+                    displayHint: Kirigami.DisplayHint.KeepVisible
+                    visible: configDialog.currentWallpaper == "org.kde.slideshow"
+                    onTriggered: thumbnailsComponent.imageModel.selectAllSlides();
+                },
+                Kirigami.Action {
+                    icon.name: "edit-select-none-symbolic"
+                    shortcut: StandardKey.Deselect
+                    text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the things being unselected are wallpapers", "Select None")
+                    Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Unselect All Slides")
+                    displayHint: Kirigami.DisplayHint.KeepVisible
+                    visible: configDialog.currentWallpaper == "org.kde.slideshow"
+                    onTriggered: thumbnailsComponent.imageModel.deselectAllSlides();
                 }
             ]
         }
@@ -102,14 +150,40 @@ Item {
                 view.model: thumbnailsComponent.imageModel
 
                 //set the size of the cell, depending on Screen resolution to respect the aspect ratio
-                view.implicitCellWidth: screenSize.width / 10 + Kirigami.Units.smallSpacing * 2
-                view.implicitCellHeight: screenSize.height / 10 + Kirigami.Units.smallSpacing * 2 + Kirigami.Units.gridUnit * 3
+                view.implicitCellWidth: {
+                    const factor = screenSize.width / screenSize.height; // As a pct of screen height
+                    const intendedLength = Kirigami.Units.gridUnit * (Kirigami.Settings.isMobile ? 10 : 6);
+                    return factor * intendedLength + Kirigami.Units.smallSpacing * 2
+                }
+                view.implicitCellHeight: {
+                    const intendedLength = Kirigami.Units.gridUnit * (Kirigami.Settings.isMobile ? 10 : 6);
+                    return intendedLength + Kirigami.Units.smallSpacing * 2 + Kirigami.Units.gridUnit * 3
+                }
 
                 view.reuseItems: true
 
                 view.delegate: WallpaperDelegate {
                     color: cfg_Color
-                    previewSize: Qt.size(thumbnailsComponent.screenSize.width / 8, thumbnailsComponent.screenSize.height / 8)
+                    previewSize: {
+                        // Set minimum image sample size, otherwise it's very blurry
+                        const baseSize = Kirigami.Units.gridUnit * 22;
+                        const preferredSize = Qt.size(thumbnailsComponent.screenSize.width / 8, thumbnailsComponent.screenSize.height / 8);
+                        const aspectRatio = thumbnailsComponent.screenSize.width / thumbnailsComponent.screenSize.height;
+
+                        if (aspectRatio >= 1.0) {
+                            if (preferredSize.width >= baseSize) {
+                                return preferredSize;
+                            } else {
+                                return Qt.size(baseSize, baseSize / aspectRatio);
+                            }
+                        } else {
+                            if (preferredSize.height >= baseSize) {
+                                return preferredSize;
+                            } else {
+                                return Qt.size(baseSize * aspectRatio, baseSize);
+                            }
+                        }
+                    }
                 }
             }
         }

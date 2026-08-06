@@ -1,10 +1,10 @@
 /*
- SPDX-FileCopyrightText: 2013 Marco Martin <mart@kde.org>
- SPDX-FileCopyrightText: 2014 Kai Uwe Broulik <kde@privat.broulik.de>
- SPDX-FileCopyrightText: 2019 David Redondo <kde@david-redondo.de>
+    SPDX-FileCopyrightText: 2013 Marco Martin <mart@kde.org>
+    SPDX-FileCopyrightText: 2014 Kai Uwe Broulik <kde@privat.broulik.de>
+    SPDX-FileCopyrightText: 2019 David Redondo <kde@david-redondo.de>
 
- SPDX-License-Identifier: GPL-2.0-or-later
- */
+    SPDX-License-Identifier: GPL-2.0-or-later
+*/
 
 import QtQuick
 import QtQuick.Controls as QtControls2
@@ -15,6 +15,7 @@ import org.kde.kquickcontrolsaddons
 import org.kde.newstuff as NewStuff
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
+import org.kde.config as KConfig
 
 /**
  * For proper alignment, an ancestor **MUST** have id "appearanceRoot" and property "parentLayout"
@@ -39,12 +40,14 @@ ColumnLayout {
   property bool cfg_SlideshowFoldersFirstDefault: false
   property alias cfg_Blur: blurRadioButton.checked
   property bool cfg_BlurDefault
-  property var cfg_SlidePaths: []
-  property var cfg_SlidePathsDefault: []
+  property list<string cfg_SlidePaths: []
+  property list<string cfg_SlidePathsDefault: []
   property int cfg_SlideInterval: 0
   property int cfg_SlideIntervalDefault: 0
-  property var cfg_UncheckedSlides: []
-  property var cfg_UncheckedSlidesDefault: []
+  property list<string cfg_UncheckedSlides: []
+  property list<string cfg_UncheckedSlidesDefault: []
+  property int cfg_DynamicMode: 0
+  property int cfg_DynamicModeDefault: 0
 
   // custom property for the active blur effect
   property alias cfg_ActiveBlur: activeBlurRadioButton.checked
@@ -56,17 +59,17 @@ ColumnLayout {
   property alias cfg_ActiveColorColor: activeColorColorButton.color
   property alias cfg_IsSlideshow: activeSlideshowRadioButton.checked
 
-  signal configurationChanged()
-  /**
-   * Emitted when the user finishes adding images using the file dialog.
-   */
-  signal wallpaperBrowseCompleted();
+    signal configurationChanged()
+    /**
+     * Emitted when the user finishes adding images using the file dialog.
+     */
+    signal wallpaperBrowseCompleted();
 
-  onScreenSizeChanged: function() {
-    if (thumbnailsLoader.item) {
-      thumbnailsLoader.item.screenSize = root.screenSize;
+    onScreenSizeChanged: function() {
+        if (thumbnailsLoader.item) {
+            thumbnailsLoader.item.screenSize = root.screenSize;
+        }
     }
-  }
 
   function saveConfig() {
     if (configDialog.currentWallpaper === "a2n.blur" && imageWallpaper.wallpaperModel) {
