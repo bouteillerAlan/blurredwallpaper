@@ -14,7 +14,7 @@ import org.kde.kquickcontrolsaddons
 import org.kde.kcmutils as KCM
 
 KCM.GridDelegate {
-  id: wallpaperDelegate
+    id: wallpaperDelegate
 
   property alias color: backgroundRect.color
   property alias previewSize: previewImage.sourceSize
