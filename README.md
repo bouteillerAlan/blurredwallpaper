@@ -24,7 +24,8 @@ Blur the wallpaper if a windows is active.
 - give you the ability to deactivate the effect
 - give you the ability to change the blur radius and the animation delay
 - the slideshow wallpaper type is available too
-- `new` now you can also darken the wallpaper and choose the color and the transparency of this effect
+- now you can also darken the wallpaper and choose the color and the transparency of this effect
+- `new` switch dynamic wallpapers
 
 ### history
 
