@@ -18,6 +18,8 @@ KCM.GridDelegate {
 
   property alias color: backgroundRect.color
   property alias previewSize: previewImage.sourceSize
+  property string key: model.source
+  property list<string> selectors: model.selectors
   opacity: model.pendingDeletion ? 0.5 : 1
   scale: index, 1 // Workaround for https://bugreports.qt.io/browse/QTBUG-107458
 
@@ -154,10 +156,9 @@ Behavior on opacity {
 
 onClicked: {
   if (!cfg_IsSlideshow) {
-    cfg_Image = model.source;
-    if (typeof wallpaper !== "undefined") {
-      wallpaper.configuration.PreviewImage = cfg_Image;
-    }
+    root.selectWallpaper(key, selectors);
+  } else {
+    model.checked = !model.checked
   }
   GridView.currentIndex = index;
 }
