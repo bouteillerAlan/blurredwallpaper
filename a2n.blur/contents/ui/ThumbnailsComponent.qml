@@ -30,7 +30,7 @@ Item {
         sortRole: Qt.DisplayRole
         sortCaseSensitivity: Qt.CaseInsensitive
         sortColumn: 0
-        sourceModel: (configDialog.currentWallpaper === "org.kde.image") ? imageWallpaper.wallpaperModel : null
+        sourceModel: (!cfg_IsSlideshow) ? imageWallpaper.wallpaperModel : null
         function indexOf(image : string) : int {
             if (!sourceModel) {
                 return -1
@@ -108,7 +108,7 @@ Item {
                     text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the things being selected are wallpapers", "Select All")
                     Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Select All Slides")
                     displayHint: Kirigami.DisplayHint.KeepVisible
-                    visible: configDialog.currentWallpaper == "org.kde.slideshow"
+                    visible: cfg_IsSlideshow
                     onTriggered: thumbnailsComponent.imageModel.selectAllSlides();
                 },
                 Kirigami.Action {
@@ -117,7 +117,7 @@ Item {
                     text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button the things being unselected are wallpapers", "Select None")
                     Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Unselect All Slides")
                     displayHint: Kirigami.DisplayHint.KeepVisible
-                    visible: configDialog.currentWallpaper == "org.kde.slideshow"
+                    visible: cfg_IsSlideshow
                     onTriggered: thumbnailsComponent.imageModel.deselectAllSlides();
                 }
             ]

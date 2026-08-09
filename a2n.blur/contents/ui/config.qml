@@ -64,6 +64,10 @@ ColumnLayout {
      * Emitted when the user finishes adding images using the file dialog.
      */
     signal wallpaperBrowseCompleted();
+    /**
+     * Emitted when the user toggles the slideshow mode checkbox.
+     */
+    signal slideshowStateChanged(bool isChecked);
 
     onScreenSizeChanged: function() {
         if (thumbnailsLoader.item) {
@@ -87,6 +91,20 @@ ColumnLayout {
     dialogComponent.destroy();
   }
 
+  function selectWallpaper(wallpaper: string, selectors: list<string>): void {
+    cfg_Image = imageWallpaper.makeWallpaperUrl(wallpaper, selectors);
+    wallpaperConfiguration.PreviewImage = cfg_Image;
+  }
+
+  function selectDynamicMode(mode: /*PlasmaWallpaper.DynamicMode*/ int): void {
+    cfg_DynamicMode = mode;
+
+    if (!cfg_IsSlideshow) {
+      selectWallpaper(thumbnailsLoader.item.view.currentItem.key,
+                      thumbnailsLoader.item.view.currentItem.selectors);
+    }
+  }
+
   PlasmaWallpaper.ImageBackend {
     id: imageWallpaper
     renderingMode: (!cfg_IsSlideshow) ? PlasmaWallpaper.ImageBackend.SingleImage : PlasmaWallpaper.ImageBackend.SlideShow
@@ -94,6 +112,7 @@ ColumnLayout {
       // Lock screen configuration case
       return Qt.size(root.screenSize.width * Screen.devicePixelRatio, root.screenSize.height * Screen.devicePixelRatio)
     }
+    dynamicMode: root.cfg_DynamicMode
     onSlidePathsChanged: cfg_SlidePaths = slidePaths
     onUncheckedSlidesChanged: cfg_UncheckedSlides = uncheckedSlides
     onSlideshowModeChanged: cfg_SlideshowMode = slideshowMode
@@ -179,6 +198,49 @@ ColumnLayout {
             break;
           }
         }
+      }
+    }
+
+    QtControls2.ButtonGroup { id: dayNightModeGroup }
+
+    RowLayout {
+      visible: !cfg_IsSlideshow
+      spacing: Kirigami.Units.smallSpacing
+      Kirigami.FormData.label: i18ndc("plasma_wallpaper_org.kde.image", "@label:listbox part of a sentence: 'Switch dynamic wallpapers [based on]'", "Switch dynamic wallpapers:")
+
+      QtControls2.ComboBox {
+        valueRole: "dynamicMode"
+        textRole: "text"
+        model: [
+          {
+            dynamicMode: PlasmaWallpaper.DynamicMode.Automatic,
+            text: i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox part of a sentence: 'Switch dynamic wallpapers'", "Based on whether the Plasma style is light or dark ")},
+          {
+            dynamicMode: PlasmaWallpaper.DynamicMode.DayNight, text: i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox part of a sentence: 'Switch dynamic wallpapers'", "Based on the day-night cycle")
+          },
+          {
+            dynamicMode: PlasmaWallpaper.DynamicMode.AlwaysLight,
+            text: i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Always use light variant")
+          },
+          {
+            dynamicMode: PlasmaWallpaper.DynamicMode.AlwaysDark,
+            text: i18ndc("plasma_wallpaper_org.kde.image", "@item:inlistbox", "Always use dark variant")
+          }
+        ]
+        onActivated: root.selectDynamicMode(currentValue)
+        Component.onCompleted: currentIndex = indexOfValue(root.cfg_DynamicMode)
+
+        KCM.SettingHighlighter {
+          highlight: root.cfg_DynamicModeDefault !== root.cfg_DynamicMode
+        }
+      }
+
+      QtControls2.Button {
+        visible: root.cfg_DynamicMode == 1
+        enabled: KConfig.KAuthorized.authorizeControlModule("kcm_nighttime")
+        text: i18ndc("plasma_wallpaper_org.kde.image", "@action:button Configure day-night cycle times", "Configure…")
+        icon.name: "configure"
+        onClicked: KCM.KCMLauncher.open("kcm_nighttime")
       }
     }
 

@@ -6,13 +6,15 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as QQC2
-import QtQuick.Layouts 1.15
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 
 import org.kde.kcmutils as KCM
 import org.kde.kirigami as Kirigami
-import org.kde.plasma.wallpapers.image 2.0 as PlasmaWallpaper
+import org.kde.plasma.wallpapers.image as PlasmaWallpaper
 
 /**
  * For proper alignment, an ancestor **MUST** have id "appearanceRoot" and property "parentLayout"
@@ -206,8 +208,9 @@ ColumnLayout {
                         text: i18nd("plasma_wallpaper_org.kde.image", "Folders")
                         actions: [
                             Kirigami.Action {
-                                icon.name: "folder-add-symbolic"
+                                icon.name: "list-add-symbolic"
                                 text: i18ndc("plasma_wallpaper_org.kde.image", "@action button the thing being added is a folder", "Add…")
+                                Accessible.name: i18ndc("plasma_wallpaper_org.kde.image", "@action:button", "Add Folder…")
                                 onTriggered: root.openChooserDialog()
                             }
                         ]
@@ -284,7 +287,6 @@ ColumnLayout {
         Loader {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            anchors.fill: undefined
 
             Component.onCompleted: () => {
                 this.setSource("ThumbnailsComponent.qml", {"screenSize": slideshowComponent.screenSize});

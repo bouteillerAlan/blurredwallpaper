@@ -10,18 +10,14 @@ import QtQuick
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.wallpapers.image as Wallpaper
 import org.kde.plasma.plasmoid
-import org.kde.taskmanager as TaskManager
-import org.kde.activities as Activities
 // for FastBlur
 import Qt5Compat.GraphicalEffects
-import QtQml.Models
 
 WallpaperItem {
   id: root
 
   // BLUR CODE ----------------------------
   readonly property bool isAnyWindowActive: windowInfoLoader.item && !windowInfoLoader.item.existsWindowActive
-  property Item activeTaskItem: windowInfoLoader.item.activeTaskItem
 
   Loader {
     id: windowInfoLoader
@@ -140,6 +136,7 @@ WallpaperItem {
       usedInConfig: false
       //the oneliner of difference between image and slideshow wallpapers
       renderingMode: (!root.configuration.IsSlideshow) ? Wallpaper.ImageBackend.SingleImage : Wallpaper.ImageBackend.SlideShow
+      dynamicMode: root.configuration.DynamicMode
       targetSize: imageView.sourceSize
       slidePaths: root.configuration.SlidePaths
       slideTimer: root.configuration.SlideInterval
