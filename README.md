@@ -47,6 +47,7 @@ I have duplicated the default KDE `image` plugin so all the default effect and b
 
 ### Plasma <= 6.3
 - Download the `a2n.blur.plasma6.3` folder on the `3.6.0` release and extract it and place the folder into `~/.local/share/plasma/wallpapers/` next you need to rename it into `a2n.blur`
+- Download via [the KDE store](https://www.pling.com/p/2134907/) and choose the `a2n.blur.3.6.0.plasma6.3.tar.gz` file
 - Install it via the wallpaper plugin ("get new plugin" button into Desktop Folder Settings) and choose the `a2n.blur.3.6.0.plasma6.3.tar.gz` file
 
 ### Plasma 5
