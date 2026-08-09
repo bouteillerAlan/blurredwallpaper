@@ -34,7 +34,13 @@ I have duplicated the default KDE `image` plugin so all the default effect and b
 
 ## Installation
 
-### Plasma 6
+**Note:** The `a2n.blur.plasma6.3` folder containt the version of this plugin prior to the implementation of the `switch dynamic wallpaper` feature. I do not aim to update it later on (except bug). You can use it for example with Debian or other distro that use an "older" plasma release.
+
+### Plasma <= 6.3
+- Download the `a2n.blur.plasma6.3` folder on the `3.6.0` release and extract it and place the folder into `~/.local/share/plasma/wallpapers/` next you need to rename it into `a2n.blur`
+- Install it via the wallpaper plugin ("get new plugin" button into Desktop Folder Settings) and choose the `a2n.plasma6.3` folder
+
+### Plasma >= 6.3
 - Download via [the KDE store](https://www.pling.com/p/2134907/)
 - Install it via the wallpaper plugin ("get new plugin" button into Desktop Folder Settings)
 - Download the last release and extract it and place the folder into `~/.local/share/plasma/wallpapers/` next you need to rename it into `a2n.blur`
