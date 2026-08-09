@@ -95,7 +95,9 @@ ColumnLayout {
   }
 
   function selectWallpaper(wallpaper: string, selectors: list<string>): void {
-    cfg_Image = imageWallpaper.makeWallpaperUrl(wallpaper, selectors);
+    // makeWallpaperUrl() only exists since Plasma 6.6; on Plasma 6.3/6.4 the
+    // wallpaper path can be used directly.
+    cfg_Image = wallpaper;
     wallpaperConfiguration.PreviewImage = cfg_Image;
   }
 
