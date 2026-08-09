@@ -17,9 +17,9 @@ KCM.GridDelegate {
     id: wallpaperDelegate
 
   property alias color: backgroundRect.color
-  property alias previewSize: previewImage.sourceSize
-  property string key: model.source
-  property list<string> selectors: model.selectors
+  property var previewSize
+  property string key: model.packageName || model.path
+  property list<string> selectors: []
   opacity: model.pendingDeletion ? 0.5 : 1
   scale: index, 1 // Workaround for https://bugreports.qt.io/browse/QTBUG-107458
 
@@ -65,7 +65,23 @@ thumbnail: Rectangle {
     width: Kirigami.Units.iconSizes.large
     height: width
     source: "view-preview"
-    visible: previewImage.status != Image.Ready
+    visible: !previewImage.visible
+  }
+
+  // A QPixmapItem (QQuickPaintedItem) must not be used directly as an effect/layer
+  // source: its texture provider is unreliable as a ShaderEffectSource on Plasma
+  // 6.4+. Wrap it in a plain Item and use that as the source instead.
+  Item {
+    id: blurSource
+    anchors.fill: parent
+    visible: cfg_Blur
+
+    QPixmapItem {
+      anchors.fill: parent
+      smooth: true
+      pixmap: model.screenshot
+      fillMode: QPixmapItem.PreserveAspectCrop
+    }
   }
 
   FastBlur {
@@ -73,25 +89,36 @@ thumbnail: Rectangle {
     visible: cfg_Blur
     anchors.fill: parent
     radius: 4
-    source: Image {
-      asynchronous: true
-      retainWhileLoading: true
-      cache: false
-      fillMode: Image.PreserveAspectCrop
-      source: fastBlur.visible ? previewImage.source : ""
-      sourceSize: previewImage.sourceSize
-      visible: false
-    }
+    source: blurSource
   }
 
-  Image {
-    id: previewImage
+  Item {
+    id: previewContainer
     anchors.fill: parent
-    asynchronous: true
-    retainWhileLoading: true
-    cache: false
-    fillMode: cfg_FillMode
-    source: model.preview || ""
+
+    QPixmapItem {
+      id: previewImage
+      anchors.fill: parent
+      visible: model.screenshot !== null
+      smooth: true
+      pixmap: model.screenshot
+      fillMode: {
+        if (cfg_FillMode === Image.Stretch) {
+          return QPixmapItem.Stretch;
+        } else if (cfg_FillMode === Image.PreserveAspectFit) {
+          return QPixmapItem.PreserveAspectFit;
+        } else if (cfg_FillMode === Image.PreserveAspectCrop) {
+          return QPixmapItem.PreserveAspectCrop;
+        } else if (cfg_FillMode === Image.Tile) {
+          return QPixmapItem.Tile;
+        } else if (cfg_FillMode === Image.TileVertically) {
+          return QPixmapItem.TileVertically;
+        } else if (cfg_FillMode === Image.TileHorizontally) {
+          return QPixmapItem.TileHorizontally;
+        }
+        return QPixmapItem.PreserveAspectFit;
+      }
+    }
 
     layer.enabled: cfg_ActiveBlur
 
@@ -99,14 +126,6 @@ thumbnail: Rectangle {
       visible: cfg_ActiveBlur
       anchors.fill: parent
       radius: wallpaperDelegate.hovered ? cfg_BlurRadius : 0
-      source: Image {
-        asynchronous: true
-        cache: false
-        fillMode: Image.PreserveAspectCrop
-        source: previewImage.source
-        sourceSize: previewImage.sourceSize
-        anchors.fill: parent
-      }
 
       // animate the blur apparition
       Behavior on radius {
@@ -119,8 +138,8 @@ thumbnail: Rectangle {
 
   ColorOverlay {
     id: activeColorOverlay
-    anchors.fill: previewImage
-    source: previewImage
+    anchors.fill: previewContainer
+    source: previewContainer
     visible: cfg_ActiveColor
     color: cfg_ActiveColorColor
     opacity: (cfg_ActiveColor && wallpaperDelegate.hovered) ? cfg_ActiveColorTransparency / 100 : 0
